@@ -9,9 +9,10 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+router.post('/', createMessage);
+
 router.use(protect);
 
-router.post('/', createMessage);
 router.get('/', getAllMessages);
 router.get('/:id', getMessage);
 router.delete('/:id', deleteMessage);
