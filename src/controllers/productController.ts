@@ -91,8 +91,8 @@ export const createProduct = async (req: Request, res: Response) => {
         }
 
         // Generate slug manually
-        if (req.body.name && !req.body.slug) {
-            req.body.slug = req.body.name
+        if (req.body.title && !req.body.slug) {
+            req.body.slug = req.body.title
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');

@@ -20,6 +20,20 @@ export const parseProductBody = (req: Request, res: Response, next: NextFunction
     if (req.body.price) {
         req.body.price = Number(req.body.price);
     }
+    if (req.body.stock) {
+        req.body.stock = Number(req.body.stock);
+    }
+
+    // Parse 'tags' if it's a string
+    if (req.body.tags && typeof req.body.tags === 'string') {
+        try {
+            req.body.tags = JSON.parse(req.body.tags);
+        } catch (error) {
+            if (req.body.tags.includes("[") === false) {
+                req.body.tags = req.body.tags.split(',').map((s: string) => s.trim());
+            }
+        }
+    }
 
     next();
 };

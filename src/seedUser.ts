@@ -6,13 +6,13 @@ dotenv.config();
 
 const seedUser = async () => {
     try {
-        const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/hayah_db";
+        const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mbk2_backend";
         await mongoose.connect(MONGO_URI);
         console.log('MongoDB connected');
 
-        const email = 'hayah.perfumes@gmail.com';
-        const password = 'hayah123';
-        const name = 'Hayah Admin';
+        const email = 'MBK2@admin.com';
+        const password = 'mbk222';
+        const name = 'MBK2 Admin';
 
         const userExists = await User.findOne({ email });
 
@@ -23,6 +23,7 @@ const seedUser = async () => {
                 name,
                 email,
                 password,
+                role: 'admin',
             });
             console.log(`User created: ${user.email}`);
         }
