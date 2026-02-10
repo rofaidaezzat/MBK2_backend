@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Product from '../models/Product.js';
+import { generateUniqueSlug } from '../utils/slugGenerator.js';
 
 export const getAllProducts = async (req: Request, res: Response) => {
     try {
@@ -90,12 +91,9 @@ export const createProduct = async (req: Request, res: Response) => {
             req.body.images = imageUrls;
         }
 
-        // Generate slug manually
+        // Generate unique slug
         if (req.body.title && !req.body.slug) {
-            req.body.slug = req.body.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)+/g, '');
+            req.body.slug = await generateUniqueSlug(Product, req.body.title);
         }
 
         // Parse sizes if sent as stringified JSON (common in form-data)
