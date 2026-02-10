@@ -79,16 +79,19 @@ export const getProduct = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
     try {
         const files = req.files as Express.Multer.File[];
-        let imageUrls: string[] = [];
+        let uploadedImageUrls: string[] = [];
 
         if (files && files.length > 0) {
-            imageUrls = files.map((file) => file.path);
+            uploadedImageUrls = files.map((file) => file.path);
         }
 
-        // If 'images' is also sent in body (mixed?), handle it or overwrite? 
-        // For now, if files exist, use them. If not, use body.
-        if (imageUrls.length > 0) {
-            req.body.images = imageUrls;
+        // Combine uploaded images with any images sent in body (rare for create, but possible)
+        if (uploadedImageUrls.length > 0) {
+            if (req.body.images && Array.isArray(req.body.images)) {
+                req.body.images = [...req.body.images, ...uploadedImageUrls];
+            } else {
+                req.body.images = uploadedImageUrls;
+            }
         }
 
         // Generate unique slug
@@ -101,9 +104,6 @@ export const createProduct = async (req: Request, res: Response) => {
             try {
                 req.body.sizes = JSON.parse(req.body.sizes);
             } catch (e) {
-                // If parse fails, assume it's a single item or invalid; split by comma?
-                // Better to leave it and let validation/mongoose handle or fail.
-                // Or try splitting by comma:
                 req.body.sizes = req.body.sizes.split(',').map((s: string) => s.trim());
             }
         }
@@ -144,7 +144,7 @@ export const createProduct = async (req: Request, res: Response) => {
             code: 500,
             message: 'Error creating product',
             error: error.message || error,
-            stack: error.stack // DEBUG: Remove in production
+            stack: error.stack
         });
     }
 };
@@ -152,28 +152,26 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     try {
         const files = req.files as Express.Multer.File[];
-        let imageUrls: string[] = [];
+        let uploadedImageUrls: string[] = [];
 
         if (files && files.length > 0) {
-            imageUrls = files.map((file) => file.path);
+            uploadedImageUrls = files.map((file) => file.path);
         }
 
-        // Check if there are new files uploaded
-        if (imageUrls.length > 0) {
-            // Logic: If new files are provided, we typically replace the images array or append?
-            // Standard PUT/PATCH with a "field" usually replaces that field.
-            // If the user wants to KEEP old images, they should arguably send them in the body,
-            // but dealing with mixed file/text 'images' array in Multer/Express can be tricky (e.g. array vs single string).
-            // Simple approach: If new files uploaded, USE THEM.
-            // If we want to support APPENDING, we'd need to fetch existing product, but `findByIdAndUpdate` is one-shot.
-            // Let's stick to: "If files uploaded, they become the new 'images' list".
-            req.body.images = imageUrls;
+        // Logic: Merge existing images (from body) with new uploaded images
+        // Frontend should send existing 'images' array in body if they want to keep them
+        if (uploadedImageUrls.length > 0) {
+            if (req.body.images && Array.isArray(req.body.images)) {
+                req.body.images = [...req.body.images, ...uploadedImageUrls];
+            } else {
+                req.body.images = uploadedImageUrls;
+            }
         }
 
         const id = req.params.id as string;
         const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
             new: true,
-        }); // new: true returns the updated document
+        });
 
         if (!updatedProduct) {
             res.status(404).json({

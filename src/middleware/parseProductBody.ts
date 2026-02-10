@@ -35,5 +35,18 @@ export const parseProductBody = (req: Request, res: Response, next: NextFunction
         }
     }
 
+    // Parse 'images' if it's a string (e.g. sent from frontend as existing images JSON)
+    if (req.body.images && typeof req.body.images === 'string') {
+        try {
+            req.body.images = JSON.parse(req.body.images);
+        } catch (error) {
+            // If parse fails, assume single URL or comma separated?
+            // Safer to just leave it or wrap in array if it looks like a URL
+            if (req.body.images.startsWith("http")) {
+                req.body.images = [req.body.images];
+            }
+        }
+    }
+
     next();
 };

@@ -5,7 +5,7 @@ import cloudinary from '../config/cloudinary.js';
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'hayah_products', // Folder name in Cloudinary
+        folder: 'MBK2', // Folder name in Cloudinary
         allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
     } as any, // Type assertion needed for some multer-storage-cloudinary versions
 });

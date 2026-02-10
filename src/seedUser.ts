@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import User from './models/User.js';
 
 dotenv.config();
-
 const seedUser = async () => {
     try {
         const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mbk2_backend";
