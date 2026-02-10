@@ -45,6 +45,15 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/contact", contactMessageRoutes);
 app.use("/api/v1/orders", orderRoutes);
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error("🔥 Global Error Handler:", err);
+  res.status(500).json({
+    status: 'error',
+    message: err.message || 'Internal Server Error',
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
+});
 
 if (!process.env.JWT_SECRET) {
   console.error("❌ FATAL ERROR: JWT_SECRET is not defined in .env");

@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'MBK2', // Folder name in Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+        // allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
     } as any, // Type assertion needed for some multer-storage-cloudinary versions
 });
 
