@@ -24,6 +24,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Database Connection Middleware
+// This ensures that the database is connected before any route handler is executed.
+// This is critical for serverless environments where the connection might not be ready immediately.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
 // Routes
 app.get("/", (req, res) => {
   res.send("API is running...");
@@ -38,20 +51,18 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-// Connect to Database
-connectDB().then(() => {
-  console.log("✅ Database connected successfully");
-  // Only start listening if not in Vercel environment (or similar serverless)
-  // Vercel exports the app, it doesn't run app.listen() directly in the same way for serverless functions
-  if (process.env.NODE_ENV !== 'production') {
+// Local Development Server
+if (process.env.NODE_ENV !== 'production') {
+  connectDB().then(() => {
+    console.log("✅ Database connected successfully");
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-  }
-}).catch(err => {
-  console.error("❌ Database connection error:", err);
-  process.exit(1);
-});
+  }).catch(err => {
+    console.error("❌ Database connection error:", err);
+    process.exit(1);
+  });
+}
 
 // Export app for Vercel
 export default app;
