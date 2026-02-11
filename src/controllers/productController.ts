@@ -1,6 +1,10 @@
 import type { Request, Response } from "express";
 import Product from '../models/Product.js';
 import { generateUniqueSlug } from '../utils/slugGenerator.js';
+import cloudinary from '../config/cloudinary.js';
+
+// Cloudinary storage middleware handles the upload and populates file.path
+// No manual helper needed here anymore as per user request
 
 export const getAllProducts = async (req: Request, res: Response) => {
     try {
@@ -89,6 +93,9 @@ export const createProduct = async (req: Request, res: Response) => {
         if (uploadedImageUrls.length > 0) {
             if (req.body.images && Array.isArray(req.body.images)) {
                 req.body.images = [...req.body.images, ...uploadedImageUrls];
+            } else if (req.body.images && typeof req.body.images === 'string') {
+                // Handle single image string if necessary, but parseProductBody usually handles it
+                req.body.images = [req.body.images, ...uploadedImageUrls];
             } else {
                 req.body.images = uploadedImageUrls;
             }
@@ -159,10 +166,11 @@ export const updateProduct = async (req: Request, res: Response) => {
         }
 
         // Logic: Merge existing images (from body) with new uploaded images
-        // Frontend should send existing 'images' array in body if they want to keep them
         if (uploadedImageUrls.length > 0) {
             if (req.body.images && Array.isArray(req.body.images)) {
                 req.body.images = [...req.body.images, ...uploadedImageUrls];
+            } else if (req.body.images && typeof req.body.images === 'string') {
+                req.body.images = [req.body.images, ...uploadedImageUrls];
             } else {
                 req.body.images = uploadedImageUrls;
             }

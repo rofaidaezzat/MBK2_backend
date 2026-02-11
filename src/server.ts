@@ -46,9 +46,13 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/contact", contactMessageRoutes);
 app.use("/api/v1/orders", orderRoutes);
 // Global Error Handler
+// Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error("🔥 Global Error Handler:", err);
-  res.status(500).json({
+
+  const statusCode = err.http_code || err.status || err.statusCode || 500;
+
+  res.status(statusCode).json({
     status: 'error',
     message: err.message || 'Internal Server Error',
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,

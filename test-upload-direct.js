@@ -17,17 +17,12 @@ cloudinary.config({
 
 async function testDirectUpload() {
     try {
-        console.log("Attempting direct upload to Cloudinary...");
-        const imagePath = path.join(__dirname, 'test-image.jpg');
+        console.log("Attempting direct upload to Cloudinary via URL...");
 
-        // Ensure test image exists (reuse the one from previous step or create new)
-        // We'll rely on previous step having created it, but let's re-verify/create just in case
-        if (!process.env.CLOUDINARY_CLOUD_NAME) {
-            console.error("Missing Cloudinary Env Vars");
-            return;
-        }
+        // Use a stable public image
+        const remoteImage = "https://res.cloudinary.com/demo/image/upload/sample.jpg";
 
-        const result = await cloudinary.uploader.upload(imagePath, {
+        const result = await cloudinary.uploader.upload(remoteImage, {
             folder: 'MBK2',
             resource_type: 'auto'
         });

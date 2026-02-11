@@ -4,10 +4,26 @@ import cloudinary from '../config/cloudinary.js';
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'MBK2', // Folder name in Cloudinary
-        // allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-    } as any, // Type assertion needed for some multer-storage-cloudinary versions
+    params: async (req, file) => {
+        return {
+            folder: 'MBK2',
+            resource_type: 'auto',
+            public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+        };
+    },
 });
 
-export const upload = multer({ storage: storage });
+export const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+        console.log('--- File Filter ---');
+        console.log('File:', file.originalname, 'Mime:', file.mimetype);
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            console.log('Rejected file:', file.originalname, 'Mime:', file.mimetype);
+            cb(new Error('Invalid image file'));
+        }
+    }
+});
