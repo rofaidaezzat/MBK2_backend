@@ -5,6 +5,7 @@ import productRoutes from "./routes/productRoutes.js";
 import contactMessageRoutes from "./routes/contactMessageRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
 import connectDB from "./config/db.js";
 
 // Global error handlers first
@@ -45,6 +46,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/contact", contactMessageRoutes);
 app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/stats", statsRoutes);
 // Global Error Handler
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
